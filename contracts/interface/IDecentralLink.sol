@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-interface IDrcentralLink {
+interface IDecentralLink {
     
     struct RangeNumber {
         uint256 min;
@@ -13,9 +13,9 @@ interface IDrcentralLink {
 
     function addRangeOwner(uint256 prefix, uint256 min, uint256 max, uint256 price) external;
 
-    function addRange(uint256 prefix, uint256 min, uint256 max, uint256 price) external;
+    function addRange(uint256 prefix, uint256 min, uint256 max, uint256 price) payable external;
     
-    function changeRange(uint256 prefix, uint256 price) external;
+    function changeRange(uint256 prefix, uint256 min, uint256 max, uint256 price) payable external;
     
     function changePrice(uint256 price) external;
 

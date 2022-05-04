@@ -2,23 +2,28 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interface/IDecentralLink.sol";
 
-contract DrcentralLink is ERC721, Ownable, IDecentralLink {
+contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
+    using Strings for uint256;
 
-    uint256 private _priceNumber = 1 ether / 1000;
+        // Base URI
+    string private _uri;
+    
+    uint256 public counter = 1;
 
-    mapping (uint256 => RangeNumber) public prefix;
-    mapping (uint256 => address) public prefixOwner;
+    uint256 private _salePrice = 100 ether;
+
+    mapping (string => uint256) public prefixPrice;
+    mapping (string => address) public prefixOwner;
+    mapping (string => uint256) public prefixId;
+
     bool public pause;
     
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {
-    }
-    
-    function setPause (bool status_) override external {
-        pause = status_;
     }
 
     modifier checkPause {
@@ -26,46 +31,71 @@ contract DrcentralLink is ERC721, Ownable, IDecentralLink {
         _;
     }
 
-    function addRangeOwner(uint256 prefix_, uint256 min, uint256 max, uint256 price) override onlyOwner checkPause external {
-        require(prefixOwner[prefix_] == address(0), "This prefix busy");
-        require(min < max, "Incorrect min or max");
-        prefix[prefix_] = RangeNumber(min, max, price);
-        prefixOwner[prefix_] = msg.sender;
+    function setBaseURI(string memory uri_) public onlyOwner {
+        _uri = uri_;
     }
 
-    function addRange(uint256 prefix_, uint256 min, uint256 max, uint256 price) payable override checkPause external {
-        require(prefixOwner[prefix_] == address(0), "This prefix busy");
-        require(min < max, "Incorrect min or max");
+    function _baseURI() internal view override returns (string memory) {
+        return _uri;
+    }
 
-        prefix[prefix_] = RangeNumber(min, max, price);
+    function baseURI() public view returns (string memory) {
+        return _uri;
+    }
+
+    function setPause (bool status_) override external {
+        pause = status_;
+    }
+
+    function setSalePrice (uint256 price) external onlyOwner {
+        _salePrice = price;
+    }
+
+    function addPrefixOwner(string memory prefix_, uint256 price) override onlyOwner checkPause external {
+        require(bytes(prefix_).length < 10, "Error: This prefix bigest");
+        require(prefixOwner[prefix_] == address(0), "This prefix busy");
+
+        prefixPrice[prefix_] = price;
         prefixOwner[prefix_] = msg.sender;
-        (bool success, ) = payable(msg.sender).call{ value: _priceNumber * (10 ** (max- min)) }("");
+        prefixId[prefix_] = counter;
+        counter++;
+    }
+
+    function addPrefix(string memory prefix_, uint256 price) payable override checkPause external {
+        require(bytes(prefix_).length < 10, "Error: This prefix bigest");
+        require(prefixOwner[prefix_] == address(0), "This prefix busy");
+        require(msg.value >= _salePrice, "Error: incorrect price");
+
+        prefixPrice[prefix_] = price;
+        prefixOwner[prefix_] = msg.sender;
+        prefixId[prefix_] = counter;
+        counter++;
+
+        (bool success, ) = payable(owner()).call{ value: msg.value }("");
         require(
                 success,
                 "Address: unable to send value, recipient may have reverted"
             );
     }
     
-    function changeRange(uint256 prefix_, uint256 min, uint256 max, uint256 price) payable override checkPause external {
-        require(prefixOwner[prefix_] == msg.sender, "This prefix busy");
-        require(min < max, "Incorrect min or max");
-        require(min > prefix[prefix_].max, "Incorrect min");
-        prefix[prefix_] = RangeNumber(min, max, price);
-        (bool success, ) = payable(msg.sender).call{ value: _priceNumber * (10 ** (max- min)) }("");
+    function changePrice(string memory prefix_, uint256 price) override onlyOwner checkPause external {
+        prefixPrice[prefix_] = price;
+    }
+
+    function mintNumber(string memory prefix_, uint256 number) override payable checkPause external {
+        require(msg.value >= prefixPrice[prefix_], "Error: incorrect price");
+        require(prefixOwner[prefix_] != address(0), "Error: incorrect prefix");
+        uint256 lenNumber = bytes(number.toString()).length;
+        console.log(lenNumber);
+        require(bytes(Strings.toString(number)).length < 17, "ErrorL incorrect lenght number");
+        uint256 tokenId = prefixId[prefix_] * (10 ** lenNumber) + number;
+
+        _safeMint(msg.sender, tokenId);
+        (bool success, ) = payable(prefixOwner[prefix_]).call{ value: msg.value }("");
         require(
                 success,
                 "Address: unable to send value, recipient may have reverted"
-            );
-
-
-
-    }
-    
-    function changePrice(uint256 price) override onlyOwner checkPause external {
-        _priceNumber = price;
-    }
-
-    function mintNumber(uint256 prefix, uint256 number) override checkPause external {
+            );  
 
     }
 

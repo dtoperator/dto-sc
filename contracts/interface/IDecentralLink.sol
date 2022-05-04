@@ -3,23 +3,15 @@ pragma solidity ^0.8.0;
 
 interface IDecentralLink {
     
-    struct RangeNumber {
-        uint256 min;
-        uint256 max;
-        uint256 price;
-    }
-
     function setPause(bool status_) external;
 
-    function addRangeOwner(uint256 prefix, uint256 min, uint256 max, uint256 price) external;
+    function addPrefixOwner(string memory prefix_, uint256 price) external;
 
-    function addRange(uint256 prefix, uint256 min, uint256 max, uint256 price) payable external;
-    
-    function changeRange(uint256 prefix, uint256 min, uint256 max, uint256 price) payable external;
-    
-    function changePrice(uint256 price) external;
+    function addPrefix(string memory prefix, uint256 price) payable external;
+       
+    function changePrice(string memory prefix_, uint256 price) external;
 
-    function mintNumber(uint256 prefix, uint256 number) external;
+    function mintNumber(string memory prefix, uint256 number) payable external;
 
 
 }

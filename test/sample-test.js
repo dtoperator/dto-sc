@@ -1,19 +1,36 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Greeter", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    await greeter.deployed();
+describe("DecentralLink", function () {
+  let decentralLink;
+  let DecentralLink;
+  beforeEach(async function () {
+    [owner, alice, bob] = await ethers.getSigners();
 
-    expect(await greeter.greet()).to.equal("Hello, world!");
+    DecentralLink = await ethers.getContractFactory("DecentralLink");
+    decentralLink = await DecentralLink.deploy("Test Phone Number", "TPN");
 
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
+    await decentralLink.connect(owner).setBaseURI("test/");
+    await decentralLink.connect(owner).setPause(true);
+  });
+  
+  it("Sale Our Prefix, Sale NFT phonenumber", async function () {
 
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
+    await decentralLink.addPrefixOwner("MTC", await ethers.utils.parseEther("0.1"));
+    console.log((await owner.getBalance()));
+    await decentralLink.connect(alice).mintNumber("MTC", 123456789, {value: await ethers.utils.parseEther("0.1")});
+    console.log((await decentralLink.connect(alice).tokenOfOwnerByIndex(alice.address, 0)).toString());
+    console.log((await owner.getBalance()));
 
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+  });
+
+  it("Sale Other Prefix, Sale NFT phonenumber", async function () {
+
+    await decentralLink.connect(bob).addPrefix("MTC", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")});
+    console.log((await bob.getBalance()));
+    await decentralLink.connect(alice).mintNumber("MTC", 123456789, {value: await ethers.utils.parseEther("0.1")});
+    console.log((await decentralLink.connect(alice).tokenOfOwnerByIndex(alice.address, 0)).toString());
+    console.log((await bob.getBalance()));
+
   });
 });

@@ -5,13 +5,13 @@ interface IDecentralLink {
     
     function setPause(bool status_) external;
 
-    function addPrefixOwner(string memory prefix_, uint256 price) external;
+    function addPrefixOwner(string memory prefix_, uint256 price) external returns(uint256);
 
-    function addPrefix(string memory prefix, uint256 price) payable external;
+    function addPrefix(string memory prefix, uint256 price) payable external returns(uint256);
        
-    function changePrice(string memory prefix_, uint256 price) external;
+    function changePrice(uint256 id, uint256 price) external;
 
-    function mintNumber(string memory prefix, uint256 number) payable external;
+    function mintNumber(uint256 number) payable external;
 
 
 }

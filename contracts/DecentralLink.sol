@@ -10,6 +10,8 @@ import "./interface/IDecentralLink.sol";
 contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
     using Strings for uint256;
 
+    uint256 constant public MIN_DURATION = 365 days; 
+
     // Base URI
     string private _uri;
 
@@ -23,11 +25,14 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
     mapping(uint256 => string) public prefixName;
     mapping(string => uint256) public prefixId;
 
+    mapping(uint256 => uint256) public endRent;
+
+
     bool public pause;
 
     event AddPrefix(string prefix_, uint256 counter_, uint256 price_);
     event ChangePrice(uint256 id, uint256 price_);
-    event MintNumber(uint256 prefixNumber);
+    event MintNumber(uint256 prefixNumber, uint256 duration);
 
     constructor(string memory name_, string memory symbol_)
         ERC721(name_, symbol_)
@@ -87,6 +92,12 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         maxSizePrefix = size;
     }
 
+    function changeOwnerPrerix(string memory prefix, address newAddress) external override {
+        require(prefixOwner[prefixId[prefix]] == msg.sender, "Error: You don`t owner this prefix");
+        prefixOwner[prefixId[prefix]] = newAddress;
+    }
+
+
     function _indexOf(
         string memory _base,
         string memory _value,
@@ -126,7 +137,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
 
         counter++;
 
-        emit AddPrefix(prefix_, counter, price);
+        emit AddPrefix(prefix_, counter - 1, price);
 
         return counter - 1;
     }
@@ -148,6 +159,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         checkPause
         returns (uint256)
     {
+        require(msg.value >= _salePrice, "Error: incorrect value price");
         uint256 id = _addPrefix(prefix_, price);
 
         (bool success, ) = payable(owner()).call{value: msg.value}("");
@@ -173,12 +185,23 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         emit ChangePrice(id, price);
     }
 
-    function mintNumber(uint256 prefixNumber)
+    function reRent(uint256 prefixNumber, uint256 duration) external payable {
+        require( duration >= MIN_DURATION, "Error: duration incorrect");
+        uint256 lenNumber = bytes(prefixNumber.toString()).length;
+        uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
+        require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect price");
+        endRent[prefixNumber] += duration;
+    }
+
+
+    function mintNumber(uint256 prefixNumber, uint256 duration)
         external
         payable
         override
         checkPause
-    {
+    {   
+        require(block.timestamp > endRent[prefixNumber], "Error: Rent don`t end");
+        require( duration >= MIN_DURATION, "Error: duration incorrect");
         uint256 lenNumber = bytes(prefixNumber.toString()).length;
         console.log(lenNumber);
         uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
@@ -186,11 +209,18 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
 
         require(prefixOwner[prefix_] != address(0), "Error: incorrect prefix");
         require(lenNumber - 8 < 11, "Error: incorrect length number");
-        require(msg.value >= prefixPrice[prefix_], "Error: incorrect price");
+        require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect price");
+
+        endRent[prefixNumber] = block.timestamp + duration;
+
+        if(_exists(prefixNumber)) {
+            // Name was previously owned, and expired
+            _burn(prefixNumber);
+        }
 
         _safeMint(msg.sender, prefixNumber);
 
-        emit MintNumber(prefixNumber);
+        emit MintNumber(prefixNumber, duration);
 
         (bool success, ) = payable(prefixOwner[prefix_]).call{value: msg.value}(
             ""

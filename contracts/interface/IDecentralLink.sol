@@ -8,6 +8,8 @@ interface IDecentralLink {
 
     function setMaxSizePrefix(uint256 size) external;
 
+    function changeOwnerPrerix(string memory prefix_, address newAddress) external;
+
     function addPrefixOwner(string memory prefix_, uint256 price)
         external
         returns (uint256);
@@ -19,5 +21,5 @@ interface IDecentralLink {
 
     function changePrice(uint256 id, uint256 price) external;
 
-    function mintNumber(uint256 number) external payable;
+    function mintNumber(uint256 number, uint256 duration) external payable;
 }

@@ -213,7 +213,6 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
 
         uint256 lenNumber = bytes(prefixNumber.toString()).length;
         uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
-        console.log(MIN_DURATION);
         require(prefixOwner[prefix_] != address(0), "Error: incorrect prefix");
         require(lenNumber - 8 < 11, "Error: incorrect length number");
         require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect price");

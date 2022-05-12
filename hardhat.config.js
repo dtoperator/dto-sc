@@ -1,6 +1,7 @@
 require("@nomiclabs/hardhat-waffle");
 require("hardhat-gas-reporter");
 require('dotenv').config(".env");
+require("solidity-coverage");
 
 
 const { API_COINMARKET } = process.env;
@@ -26,13 +27,14 @@ module.exports = {
   networks: {
     hardhat: {
       accounts: {
-        accountsBalance: "10000000000000000000000000000000000"
+        accountsBalance: "1000000000000000000000000"
       }
     }
   },
   gasReporter: {
     coinmarketcap: API_COINMARKET,
-    currency: 'USD'
+    currency: 'USD',
+    enabled: false
   }
 
 };

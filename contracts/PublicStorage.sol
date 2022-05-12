@@ -9,12 +9,12 @@ contract PublicStorage is IPublicStorage, Ownable {
 
     IERC721 public dtl;
 
-    mapping(uint256 => mapping (uint256=>address)) public addressChain;
-    mapping(uint256 => mapping (uint256=>string)) public userNameSocial;
+    mapping(uint256 => mapping (uint256=>address)) private addressChain;
+    mapping(uint256 => mapping (uint256=>string)) private userNameSocial;
 
-    mapping(uint256 => UserInfo) public userInfo;
-    mapping(uint256 => string) public nameBlockchain;
-    mapping(uint256 => string) public nameSocial;
+    mapping(uint256 => UserInfo) private userInfo;
+    mapping(uint256 => string) private nameBlockchain;
+    mapping(uint256 => string) private nameSocial;
 
     constructor(address addressDtl) {
         dtl = IERC721(addressDtl);
@@ -23,6 +23,31 @@ contract PublicStorage is IPublicStorage, Ownable {
     modifier ownerNft(uint256 tokenId) {
         require(msg.sender == dtl.ownerOf(tokenId), "Error: you don`t owner");
         _;
+    }
+
+    function getAddressChain(uint256 number, uint256 idChain) external view returns(address) {
+        return addressChain[number][idChain];
+    }
+
+
+    function getUserNameSocial(uint256 number, uint256 idSocial) external view returns(string memory) {
+        return userNameSocial[number][idSocial];
+    }
+
+    function getUserAvatar(uint256 number) external view returns(string memory) {
+        return userInfo[number].urlAvatar;
+    }
+
+    function getUserPhone(uint256 number) external view returns(string memory) {
+        return userInfo[number].numberPhone;
+    }
+
+    function getNameBlockchain(uint256 idBlockchain) external view returns(string memory) {
+        return nameBlockchain[idBlockchain];
+    }
+
+    function getNameSocial(uint256 idSocial) external view returns(string memory) {
+        return nameSocial[idSocial];
     }
 
     function addBlockchainOwner(uint256[] memory idBlockchain, string[] memory nameBlockchain_) external onlyOwner override {
@@ -34,6 +59,7 @@ contract PublicStorage is IPublicStorage, Ownable {
     
     function addWallet(uint256 number, uint256[] memory idBlockchain, address[] memory addressUser) external ownerNft(number) onlyOwner override {
         for (uint256 i = 0; i < idBlockchain.length; i++) {
+            require(bytes(nameBlockchain[idBlockchain[i]]).length > 0, "Error: invalide name Blockchain");
             addressChain[number][idBlockchain[i]] = addressUser[i];
         }
     }

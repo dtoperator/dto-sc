@@ -117,7 +117,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         return true;
     }
 
-    function _addPrefix(string memory prefix_, uint256 price)
+    function _addPrefix(string memory prefix_, uint256 price, address userAddress)
         internal
         returns (uint256)
     {
@@ -131,7 +131,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         require(counter < 100000000, "Error: end prefix counter");
 
         prefixPrice[counter] = price;
-        prefixOwner[counter] = msg.sender;
+        prefixOwner[counter] = userAddress;
         prefixName[counter] = prefix_;
         prefixId[prefix_] = counter;
 
@@ -149,7 +149,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         checkPause
         returns (uint256)
     {
-        return _addPrefix(prefix_, price);
+        return _addPrefix(prefix_, price, msg.sender);
     }
 
     function addPrefix(string memory prefix_, uint256 price)
@@ -160,7 +160,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         returns (uint256)
     {
         require(msg.value >= _salePrice, "Error: incorrect value price");
-        uint256 id = _addPrefix(prefix_, price);
+        uint256 id = _addPrefix(prefix_, price, msg.sender);
 
         (bool success, ) = payable(owner()).call{value: msg.value}("");
 
@@ -191,6 +191,14 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
         require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect price");
         endRent[prefixNumber] += duration;
+
+        (bool success, ) = payable(prefixOwner[prefix_]).call{value: msg.value}(
+            ""
+        );
+        require(
+            success,
+            "Address: unable to send value, recipient may have reverted"
+        );
     }
 
 
@@ -202,11 +210,10 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
     {   
         require(block.timestamp > endRent[prefixNumber], "Error: Rent don`t end");
         require( duration >= MIN_DURATION, "Error: duration incorrect");
-        uint256 lenNumber = bytes(prefixNumber.toString()).length;
-        console.log(lenNumber);
-        uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
-        console.log(prefixNumber % 10**(lenNumber - 8));
 
+        uint256 lenNumber = bytes(prefixNumber.toString()).length;
+        uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
+        console.log(MIN_DURATION);
         require(prefixOwner[prefix_] != address(0), "Error: incorrect prefix");
         require(lenNumber - 8 < 11, "Error: incorrect length number");
         require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect price");

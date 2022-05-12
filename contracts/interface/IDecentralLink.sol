@@ -21,5 +21,7 @@ interface IDecentralLink {
 
     function changePrice(uint256 id, uint256 price) external;
 
+    function reRent(uint256 prefixNumber, uint256 duration) external payable;
+
     function mintNumber(uint256 number, uint256 duration) external payable;
 }

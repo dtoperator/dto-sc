@@ -185,7 +185,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         emit ChangePrice(id, price);
     }
 
-    function reRent(uint256 prefixNumber, uint256 duration) external payable {
+    function reRent(uint256 prefixNumber, uint256 duration) external payable override {
         require( duration >= MIN_DURATION, "Error: duration incorrect");
         uint256 lenNumber = bytes(prefixNumber.toString()).length;
         uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);

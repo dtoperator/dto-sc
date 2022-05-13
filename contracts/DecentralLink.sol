@@ -39,7 +39,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
     {}
 
     modifier checkPause() {
-        require(pause, "Mint NFT paused");
+        require(pause, "Error: Mint NFT paused");
         _;
     }
 
@@ -126,7 +126,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
             bytes(prefix_).length < maxSizePrefix,
             "Error: This prefix bigest"
         );
-        require(_indexOf(prefix_, " ", 0), "Error: contains a space");
+        require(_indexOf(prefix_, " ", 0), "Error: Prefix contains a space");
         require(prefixId[prefix_] < 100000000, "This prefix busy");
         require(counter < 100000000, "Error: end prefix counter");
 
@@ -185,11 +185,12 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         emit ChangePrice(id, price);
     }
 
-    function reRent(uint256 prefixNumber, uint256 duration) external payable override {
+    function reRent(uint256 prefixNumber, uint256 duration) external payable override checkPause {
+        
         require( duration >= MIN_DURATION, "Error: duration incorrect");
         uint256 lenNumber = bytes(prefixNumber.toString()).length;
         uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
-        require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect price");
+        require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect value price");
         endRent[prefixNumber] += duration;
 
         (bool success, ) = payable(prefixOwner[prefix_]).call{value: msg.value}(
@@ -215,7 +216,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
         require(prefixOwner[prefix_] != address(0), "Error: incorrect prefix");
         require(lenNumber - 8 < 11, "Error: incorrect length number");
-        require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect price");
+        require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect value price");
 
         endRent[prefixNumber] = block.timestamp + duration;
 

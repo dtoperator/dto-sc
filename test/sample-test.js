@@ -82,9 +82,10 @@ describe("DecentralLink", function () {
       await expect(decentralLink.connect(alice).mintNumber(BigNumber.from("1000000012345678901"), 31536000, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: incorrect length number");
       await expect(decentralLink.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.01")})).to.be.revertedWith("Error: incorrect value price");
       await decentralLink.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")})
+
       await expect(decentralLink.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: Rent don`t end");
       await expect(decentralLink.connect(alice).reRent(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.01")})).to.be.revertedWith("Error: incorrect value price");
-      await expect(decentralLink.connect(eva).reRent(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: You aren`t owner this nft");
+      
       await decentralLink.connect(owner).setMaxSizePrefix(await ethers.utils.parseEther("200"));
     
       

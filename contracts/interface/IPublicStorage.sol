@@ -11,7 +11,7 @@ interface IPublicStorage {
 
     function addBlockchainOwner(uint256[] memory idBlockchain, string[] memory nameBlockchain) external;
     
-    function addWallet(uint256 number, uint256[] memory idBlockchain, address[] memory addressUser) external;
+    function addWallet(uint256 number, uint256[] memory idBlockchain, string[] memory addressUser) external;
     
     function addAvatar(uint256 number, string memory urlImage) external;
 

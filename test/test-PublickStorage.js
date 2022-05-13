@@ -2,110 +2,75 @@ const { expect, util } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 
-xdescribe("DecentralLink", function () {
-  let decentralLink;
-  let DecentralLink;
-  beforeEach(async function () {
-    [owner, alice, bob, eva] = await ethers.getSigners();
+describe("PublicStorage", function () {
+    let decentralLink;
+    let DecentralLink;
+    before(async function () {
+      [owner, alice, bob, eva] = await ethers.getSigners();
 
-    DecentralLink = await ethers.getContractFactory("DecentralLink");
-    decentralLink = await DecentralLink.deploy("Test Phone Number", "TPN");
+      DecentralLink = await ethers.getContractFactory("DecentralLink");
+      PublicStorage = await ethers.getContractFactory("PublicStorage");
+      decentralLink = await DecentralLink.deploy("Test Phone Number", "TPN");
+      publicStorage = await PublicStorage.deploy(decentralLink.address);
 
-    await decentralLink.connect(owner).setBaseURI("test/");
-    await decentralLink.connect(owner).setPause(true);
-  });
-
-
-  describe("Positive Test", function () {
-
-    it("Owner Sale Prefix and sale Number, uri NFT", async function () {
-
-      await decentralLink.addPrefixOwner("MTC", await ethers.utils.parseEther("0.1"));
+      await decentralLink.connect(owner).setBaseURI("test/");
+      await decentralLink.connect(owner).setPause(true);
+      await publicStorage.connect(owner).addBlockchainOwner([1, 2, 3], ["BSC", "ETH", "BTC"]);
+      await publicStorage.connect(owner).addSocialOwner([1, 2, 3], ["Facebook", "Telegram", "Twiter"]);
+      await decentralLink.connect(bob).addPrefix("MTC", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")});
       var temp = BigNumber.from(await owner.getBalance());
       await decentralLink.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")});
       expect((await decentralLink.connect(alice).tokenOfOwnerByIndex(alice.address, 0)).toString()).to.equal("100000001234567890");
-      expect(temp.add(await ethers.utils.parseEther("0.1")).eq(await owner.getBalance())).is.true;
-      expect(await decentralLink.tokenURI(BigNumber.from("100000001234567890"))).to.equal("test/MTC1234567890");
-      expect(await decentralLink.baseURI()).to.equal("test/");
-      await decentralLink.connect(owner).setMaxSizePrefix(await ethers.utils.parseEther("200"));
-      expect(BigNumber.from(await decentralLink.maxSizePrefix()).eq(await ethers.utils.parseEther("200"))).is.true;
-      
-      
+    });
+
+
+    it("Test add address", async function () {
+
+      expect((await publicStorage.getNameBlockchain(1)).toString()).to.equal("BSC");
+      expect((await publicStorage.getNameBlockchain(2)).toString()).to.equal("ETH");
+      expect((await publicStorage.getNameBlockchain(3)).toString()).to.equal("BTC");
+
+      await expect(publicStorage.connect(alice).addWallet(BigNumber.from("100000001234567890"), [1, 2, 3, 0], ["addressBSC", "addressETH", "addressBTC", "Test" ])).to.be.revertedWith("Error: invalide id Blockchain");
+      await expect(publicStorage.connect(alice).addWallet(BigNumber.from("100000001234567890"), [1, 2, 3, 4, 5, 6], ["addressBSC", "addressETH", "addressBTC", "Test" ])).to.be.revertedWith("Error: big counter idBLockchain");
+      await expect(publicStorage.connect(eva).addWallet(BigNumber.from("100000001234567890"), [1, 2, 3], ["addressBSC", "addressETH", "addressBTC"])).to.be.revertedWith("Error: you don`t owner");
+
+      await publicStorage.connect(alice).addWallet(BigNumber.from("100000001234567890"), [1, 2, 3], ["addressBSC", "addressETH", "addressBTC"]);
+
+      expect((await publicStorage.getAddressChain(BigNumber.from("100000001234567890"), 1)).toString()).to.equal("addressBSC");
+      expect((await publicStorage.getAddressChain(BigNumber.from("100000001234567890"), 2)).toString()).to.equal("addressETH");
+      expect((await publicStorage.getAddressChain(BigNumber.from("100000001234567890"), 3)).toString()).to.equal("addressBTC");
+
 
     });
 
-    it("Sale prefix, Mint NFT, reRent", async function () {
-      
-      var temp = BigNumber.from(await owner.getBalance());
-      await decentralLink.connect(bob).addPrefix("MTC", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")});
-      expect(temp.add(await ethers.utils.parseEther("100")).eq(await owner.getBalance())).is.true;
-      var temp = BigNumber.from(await bob.getBalance());
-      await decentralLink.connect(alice).mintNumber(await ethers.utils.parseEther("0.100000000123456789"), 31536000, {value: await ethers.utils.parseEther("0.1")});
-      expect((await decentralLink.connect(alice).tokenOfOwnerByIndex(alice.address, 0)).toString()).to.equal("100000000123456789");
-      expect(temp.add(await ethers.utils.parseEther("0.1")).eq(await bob.getBalance())).is.true;
-      var temp = BigNumber.from(await bob.getBalance());
-      await decentralLink.connect(alice).reRent(await ethers.utils.parseEther("0.100000000123456789"), 31536000, {value: await ethers.utils.parseEther("0.1")});
-      expect(temp.add(await ethers.utils.parseEther("0.1")).eq(await bob.getBalance())).is.true;
+    it("Test add Sosial", async function () {
+
+      expect((await publicStorage.getNameSocial(1)).toString()).to.equal("Facebook");
+      expect((await publicStorage.getNameSocial(2)).toString()).to.equal("Telegram");
+      expect((await publicStorage.getNameSocial(3)).toString()).to.equal("Twiter");
+
+      await expect(publicStorage.connect(alice).addSocial(BigNumber.from("100000001234567890"), [1, 2, 3, 0], ["addressBSC", "addressETH", "addressBTC", "Test" ])).to.be.revertedWith("Error: invalide id Social");
+
+      await publicStorage.connect(alice).addSocial(BigNumber.from("100000001234567890"), [1, 2, 3], ["LoginFacebook", "LoginTelegram", "LoginTwiter"]);
+
+      expect((await publicStorage.getUserNameSocial(BigNumber.from("100000001234567890"), 1)).toString()).to.equal("LoginFacebook");
+      expect((await publicStorage.getUserNameSocial(BigNumber.from("100000001234567890"), 2)).toString()).to.equal("LoginTelegram");
+      expect((await publicStorage.getUserNameSocial(BigNumber.from("100000001234567890"), 3)).toString()).to.equal("LoginTwiter");
 
     });
 
-    it("Change price, change owner of prefix, change sale price of prefix", async function () {
+    it("Test add Avatar", async function () {
 
-      await decentralLink.setSalePrice(ethers.utils.parseEther("200"))
-      var temp = BigNumber.from(await owner.getBalance());
-      await decentralLink.connect(bob).addPrefix("MTC", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("200")});
-      expect(temp.add(await ethers.utils.parseEther("200")).eq(await owner.getBalance())).is.true;
-      await decentralLink.connect(bob).changePrice(10000000, await ethers.utils.parseEther("0.5"))
-      var temp = BigNumber.from(await bob.getBalance());
-      await decentralLink.connect(alice).mintNumber(await ethers.utils.parseEther("0.100000000123456789"), 31536000, {value: await ethers.utils.parseEther("0.5")});
-      expect(temp.add(await ethers.utils.parseEther("0.5")).eq(await bob.getBalance())).is.true;
-      await decentralLink.connect(bob).changeOwnerPrerix("MTC", eva.address);
-      expect((await decentralLink.prefixOwner(10000000)).toString()).to.equal(eva.address.toString());
+      await publicStorage.connect(alice).addAvatar(BigNumber.from("100000001234567890"), "https://ipfs.io/ipfs/<CID>");
+      expect((await publicStorage.getUserAvatar(BigNumber.from("100000001234567890"))).toString()).to.equal("https://ipfs.io/ipfs/<CID>");
 
     });
 
-  });
+    it("Test add Phone Number", async function () {
 
-  describe("Negative Test", function () {
-
-    it("Sale Prefix and sale Number, uri NFT", async function () {
-      await decentralLink.connect(owner).setPause(false);
-      await expect(decentralLink.connect(bob).addPrefix("", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")})).to.be.revertedWith('Error: Mint NFT paused');
-      await decentralLink.connect(owner).setPause(true);
-      await expect(decentralLink.connect(bob).addPrefix("", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")})).to.be.revertedWith('Error: Empty string');
-      await expect(decentralLink.connect(bob).addPrefix("12345678901", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")})).to.be.revertedWith('Error: This prefix bigest');
-      await expect(decentralLink.connect(bob).addPrefix("3456 7890", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")})).to.be.revertedWith("Error: Prefix contains a space");
-      
-      await decentralLink.addPrefixOwner("MTC", await ethers.utils.parseEther("0.1"));
-      var temp = BigNumber.from(await owner.getBalance());
-      await expect(decentralLink.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 3153600, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: duration incorrect");
-      await expect(decentralLink.connect(alice).mintNumber(BigNumber.from("1000000012345678901"), 31536000, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: incorrect length number");
-      await expect(decentralLink.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.01")})).to.be.revertedWith("Error: incorrect value price");
-      await decentralLink.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")})
-      await expect(decentralLink.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: Rent don`t end");
-      await expect(decentralLink.connect(alice).reRent(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.01")})).to.be.revertedWith("Error: incorrect value price");
-      await expect(decentralLink.connect(eva).reRent(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: You aren`t owner this nft");
-      await decentralLink.connect(owner).setMaxSizePrefix(await ethers.utils.parseEther("200"));
-    
-      
-    });
-
-   
-    xit("Change price, change owner of prefix, change sale price of prefix", async function () {
-
-      await decentralLink.setSalePrice(ethers.utils.parseEther("200"))
-      var temp = BigNumber.from(await owner.getBalance());
-      await decentralLink.connect(bob).addPrefix("MTC", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("200")});
-      expect(temp.add(await ethers.utils.parseEther("200")).eq(await owner.getBalance())).is.true;
-      await decentralLink.connect(bob).changePrice(10000000, await ethers.utils.parseEther("0.5"))
-      var temp = BigNumber.from(await bob.getBalance());
-      await decentralLink.connect(alice).mintNumber(await ethers.utils.parseEther("0.100000000123456789"), 31536000, {value: await ethers.utils.parseEther("0.5")});
-      expect(temp.add(await ethers.utils.parseEther("0.5")).eq(await bob.getBalance())).is.true;
-      await decentralLink.connect(bob).changeOwnerPrerix("MTC", eva.address);
-      expect((await decentralLink.prefixOwner(10000000)).toString()).to.equal(eva.address.toString());
+      await publicStorage.connect(alice).addNumberPhone(BigNumber.from("100000001234567890"), "877 798 3752");
+      expect((await publicStorage.getUserPhone(BigNumber.from("100000001234567890"))).toString()).to.equal("877 798 3752");
 
     });
-
-  });
 
 });

@@ -9,7 +9,7 @@ contract PublicStorage is IPublicStorage, Ownable {
 
     IERC721 public dtl;
 
-    mapping(uint256 => mapping (uint256=>address)) private addressChain;
+    mapping(uint256 => mapping (uint256=>string)) private addressChain;
     mapping(uint256 => mapping (uint256=>string)) private userNameSocial;
 
     mapping(uint256 => UserInfo) private userInfo;
@@ -25,7 +25,13 @@ contract PublicStorage is IPublicStorage, Ownable {
         _;
     }
 
-    function getAddressChain(uint256 number, uint256 idChain) external view returns(address) {
+    modifier lengthArray(uint256[] memory idArray) {
+        require(idArray.length < 5, "Error: big counter idBLockchain");
+
+        _;
+    }
+
+    function getAddressChain(uint256 number, uint256 idChain) external view returns(string memory) {
         return addressChain[number][idChain];
     }
 
@@ -51,15 +57,14 @@ contract PublicStorage is IPublicStorage, Ownable {
     }
 
     function addBlockchainOwner(uint256[] memory idBlockchain, string[] memory nameBlockchain_) external onlyOwner override {
-        require(idBlockchain.length < 21, "Error: big counter idBLockchain");
         for (uint256 i = 0; i < idBlockchain.length; i++) {
             nameBlockchain[idBlockchain[i]] = nameBlockchain_[i];
         }
     }
     
-    function addWallet(uint256 number, uint256[] memory idBlockchain, address[] memory addressUser) external ownerNft(number) onlyOwner override {
+    function addWallet(uint256 number, uint256[] memory idBlockchain, string[] memory addressUser) external ownerNft(number) lengthArray(idBlockchain) override {
         for (uint256 i = 0; i < idBlockchain.length; i++) {
-            require(bytes(nameBlockchain[idBlockchain[i]]).length > 0, "Error: invalide name Blockchain");
+            require(bytes(nameBlockchain[idBlockchain[i]]).length > 0, "Error: invalide id Blockchain");
             addressChain[number][idBlockchain[i]] = addressUser[i];
         }
     }
@@ -73,15 +78,14 @@ contract PublicStorage is IPublicStorage, Ownable {
     }
 
     function addSocialOwner(uint256[] memory idSocial, string[] memory nameSocial_) external onlyOwner override {
-        require(idSocial.length < 21, "Error: big counter idBLockchain");
         for (uint256 i = 0; i < idSocial.length; i++) {
             nameSocial[idSocial[i]] = nameSocial_[i];
         }
     }
 
-    function addSocial(uint256 number, uint256[] memory idSocial, string[] memory userName) external ownerNft(number) override {
-        require(idSocial.length < 21, "Error: big counter idBLockchain");
+    function addSocial(uint256 number, uint256[] memory idSocial, string[] memory userName) external ownerNft(number) lengthArray(idSocial) override {
         for (uint256 i = 0; i < idSocial.length; i++) {
+            require(bytes(nameSocial[idSocial[i]]).length > 0, "Error: invalide id Social");
             userNameSocial[number][idSocial[i]] = userName[i];
         }
     }

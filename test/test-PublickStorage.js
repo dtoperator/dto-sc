@@ -15,6 +15,7 @@ describe("PublicStorage", function () {
 
       await decentralLink.connect(owner).setBaseURI("test/");
       await decentralLink.connect(owner).setPause(true);
+      await decentralLink.connect(owner).setPausePrefix(true);
       await publicStorage.connect(owner).addBlockchainOwner([1, 2, 3], ["BSC", "ETH", "BTC"]);
       await publicStorage.connect(owner).addSocialOwner([1, 2, 3], ["Facebook", "Telegram", "Twiter"]);
       await decentralLink.connect(bob).addPrefix("MTC", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")});

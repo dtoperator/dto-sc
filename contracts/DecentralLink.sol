@@ -29,6 +29,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
 
 
     bool public pause;
+    bool public statusPrefix;
 
     event AddPrefix(string prefix_, uint256 counter_, uint256 price_);
     event ChangePrice(uint256 id, uint256 price_);
@@ -39,12 +40,21 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
     {}
 
     modifier checkPause() {
-        require(pause, "Error: Mint NFT paused");
+        require(pause, "Error: Contract paused");
         _;
     }
 
-    function setBaseURI(string memory uri_) public onlyOwner {
+    modifier pausePrefix() {
+        require(statusPrefix, "Error: Mint Prefix paused");
+        _;
+    }
+
+    function setBaseURI(string memory uri_) external onlyOwner {
         _uri = uri_;
+    }
+
+    function setPausePrefix(bool status) external onlyOwner {
+        statusPrefix = status;
     }
 
     function tokenURI(uint256 tokenId)
@@ -147,6 +157,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         override
         onlyOwner
         checkPause
+        pausePrefix
         returns (uint256)
     {
         return _addPrefix(prefix_, price, msg.sender);
@@ -157,6 +168,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         payable
         override
         checkPause
+        pausePrefix
         returns (uint256)
     {
         require(msg.value >= _salePrice, "Error: incorrect value price");

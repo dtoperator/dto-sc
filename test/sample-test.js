@@ -13,6 +13,7 @@ describe("DecentralLink", function () {
 
     await decentralLink.connect(owner).setBaseURI("test/");
     await decentralLink.connect(owner).setPause(true);
+    await decentralLink.connect(owner).setPausePrefix(true);
   });
 
 
@@ -30,8 +31,6 @@ describe("DecentralLink", function () {
       await decentralLink.connect(owner).setMaxSizePrefix(await ethers.utils.parseEther("200"));
       expect(BigNumber.from(await decentralLink.maxSizePrefix()).eq(await ethers.utils.parseEther("200"))).is.true;
       
-      
-
     });
 
     it("Sale prefix, Mint NFT, reRent", async function () {
@@ -70,8 +69,11 @@ describe("DecentralLink", function () {
 
     it("Sale Prefix and sale Number, uri NFT", async function () {
       await decentralLink.connect(owner).setPause(false);
-      await expect(decentralLink.connect(bob).addPrefix("", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")})).to.be.revertedWith('Error: Mint NFT paused');
+      await expect(decentralLink.connect(bob).addPrefix("", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")})).to.be.revertedWith('Error: Contract paused');
       await decentralLink.connect(owner).setPause(true);
+      await decentralLink.connect(owner).setPausePrefix(false);
+      await expect(decentralLink.connect(bob).addPrefix("", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")})).to.be.revertedWith('Error: Mint Prefix paused');
+      await decentralLink.connect(owner).setPausePrefix(true);
       await expect(decentralLink.connect(bob).addPrefix("", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")})).to.be.revertedWith('Error: Empty string');
       await expect(decentralLink.connect(bob).addPrefix("12345678901", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")})).to.be.revertedWith('Error: This prefix bigest');
       await expect(decentralLink.connect(bob).addPrefix("3456 7890", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")})).to.be.revertedWith("Error: Prefix contains a space");

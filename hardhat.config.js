@@ -36,7 +36,7 @@ module.exports = {
       }
     },
     rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${env.process.ALC_API_KEY}`,
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALC_API_KEY}`,
       accounts: [PRIVAT_KEY],
       chainId: 4,
       gasPrice: 50000000000,

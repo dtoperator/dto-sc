@@ -29,10 +29,10 @@ async function main() {
 
   console.log("DecentralLink deployed to:", dto.address);
   console.log("PublicStorage deployed to:", publicStorage.address);
-  var tx = await dto.setBaseURI("test/", {gasLimit: 1e5});
-  await tx.wait();
-  tx = await dto.addPrefixOwner("DTO", await ethers.utils.parseEther("0.1"), {gasPrice: 5000000000, gasLimit: 1e6});
-  await tx.wait();
+  // var tx = await dto.setBaseURI("test/", {gasLimit: 1e5});
+  // await tx.wait();
+  // tx = await dto.addPrefixOwner("DTO", await ethers.utils.parseEther("0.1"), {gasPrice: 5000000000, gasLimit: 1e6});
+  // await tx.wait();
 
   try {
     await run('verify:verify', {

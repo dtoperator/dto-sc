@@ -8,7 +8,8 @@ interface IDTO {
 
     function setMaxSizePrefix(uint256 size) external;
 
-    function changeOwnerPrerix(string memory prefix_, address newAddress) external;
+    function changeOwnerPrerix(string memory prefix_, address newAddress)
+        external;
 
     function addPrefixOwner(string memory prefix_, uint256 price)
         external

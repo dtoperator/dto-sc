@@ -23,7 +23,7 @@ describe("DTO", function () {
 
       await dto.addPrefixOwner("MTC", await ethers.utils.parseEther("0.1"));
       var temp = BigNumber.from(await owner.getBalance());
-      await dto.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")});
+      await dto.connect(alice).registerNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")});
       expect((await dto.connect(alice).tokenOfOwnerByIndex(alice.address, 0)).toString()).to.equal("100000001234567890");
       expect(temp.add(await ethers.utils.parseEther("0.1")).eq(await owner.getBalance())).is.true;
       expect(await dto.tokenURI(BigNumber.from("100000001234567890"))).to.equal("test/MTC1234567890");
@@ -39,7 +39,7 @@ describe("DTO", function () {
       await dto.connect(bob).addPrefix("MTC", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")});
       expect(temp.add(await ethers.utils.parseEther("100")).eq(await owner.getBalance())).is.true;
       var temp = BigNumber.from(await bob.getBalance());
-      await dto.connect(alice).mintNumber(await ethers.utils.parseEther("0.100000000123456789"), 31536000, {value: await ethers.utils.parseEther("0.1")});
+      await dto.connect(alice).registerNumber(await ethers.utils.parseEther("0.100000000123456789"), 31536000, {value: await ethers.utils.parseEther("0.1")});
       expect((await dto.connect(alice).tokenOfOwnerByIndex(alice.address, 0)).toString()).to.equal("100000000123456789");
       expect(temp.add(await ethers.utils.parseEther("0.1")).eq(await bob.getBalance())).is.true;
       var temp = BigNumber.from(await bob.getBalance());
@@ -56,7 +56,7 @@ describe("DTO", function () {
       expect(temp.add(await ethers.utils.parseEther("200")).eq(await owner.getBalance())).is.true;
       await dto.connect(bob).changePrice(10000000, await ethers.utils.parseEther("0.5"))
       var temp = BigNumber.from(await bob.getBalance());
-      await dto.connect(alice).mintNumber(await ethers.utils.parseEther("0.100000000123456789"), 31536000, {value: await ethers.utils.parseEther("0.5")});
+      await dto.connect(alice).registerNumber(await ethers.utils.parseEther("0.100000000123456789"), 31536000, {value: await ethers.utils.parseEther("0.5")});
       expect(temp.add(await ethers.utils.parseEther("0.5")).eq(await bob.getBalance())).is.true;
       await dto.connect(bob).changeOwnerPrerix("MTC", eva.address);
       expect((await dto.prefixOwner(10000000)).toString()).to.equal(eva.address.toString());
@@ -80,12 +80,12 @@ describe("DTO", function () {
       
       await dto.addPrefixOwner("MTC", await ethers.utils.parseEther("0.1"));
       var temp = BigNumber.from(await owner.getBalance());
-      await expect(dto.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 3153600, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: duration incorrect");
-      await expect(dto.connect(alice).mintNumber(BigNumber.from("1000000012345678901"), 31536000, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: incorrect length number");
-      await expect(dto.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.01")})).to.be.revertedWith("Error: incorrect value price");
-      await dto.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")})
+      await expect(dto.connect(alice).registerNumber(BigNumber.from("100000001234567890"), 3153600, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: duration incorrect");
+      await expect(dto.connect(alice).registerNumber(BigNumber.from("1000000012345678901"), 31536000, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: incorrect length number");
+      await expect(dto.connect(alice).registerNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.01")})).to.be.revertedWith("Error: incorrect value price");
+      await dto.connect(alice).registerNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")})
 
-      await expect(dto.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: Rent don`t end");
+      await expect(dto.connect(alice).registerNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")})).to.be.revertedWith("Error: Rent don`t end");
       await expect(dto.connect(alice).reRent(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.01")})).to.be.revertedWith("Error: incorrect value price");
       
       await dto.connect(owner).setMaxSizePrefix(await ethers.utils.parseEther("200"));

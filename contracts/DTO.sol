@@ -9,7 +9,7 @@ import "./interface/IDTO.sol";
 contract DTO is ERC721Enumerable, Ownable, IDTO {
     using Strings for uint256;
 
-    uint256 constant public MIN_DURATION = 365 days; 
+    uint256 public constant MIN_DURATION = 365 days;
 
     // Base URI
     string private _uri;
@@ -26,7 +26,6 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
 
     mapping(uint256 => uint256) public endRent;
 
-
     bool public pause;
     bool public statusPrefix;
 
@@ -34,9 +33,12 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
     event ChangePrice(uint256 id, uint256 price_);
     event MintNumber(uint256 prefixNumber, uint256 duration);
 
-    constructor(string memory name_, string memory symbol_, bool statusPause, bool statusPrefix_)
-        ERC721(name_, symbol_)
-    {
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        bool statusPause,
+        bool statusPrefix_
+    ) ERC721(name_, symbol_) {
         pause = statusPause;
         statusPrefix = statusPrefix_;
     }
@@ -104,11 +106,16 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         maxSizePrefix = size;
     }
 
-    function changeOwnerPrerix(string memory prefix, address newAddress) external override {
-        require(prefixOwner[prefixId[prefix]] == msg.sender, "Error: You don`t owner this prefix");
+    function changeOwnerPrerix(string memory prefix, address newAddress)
+        external
+        override
+    {
+        require(
+            prefixOwner[prefixId[prefix]] == msg.sender,
+            "Error: You don`t owner this prefix"
+        );
         prefixOwner[prefixId[prefix]] = newAddress;
     }
-
 
     function _indexOf(
         string memory _base,
@@ -129,10 +136,11 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         return true;
     }
 
-    function _addPrefix(string memory prefix_, uint256 price, address userAddress)
-        internal
-        returns (uint256)
-    {
+    function _addPrefix(
+        string memory prefix_,
+        uint256 price,
+        address userAddress
+    ) internal returns (uint256) {
         require(bytes(prefix_).length > 0, "Error: Empty string");
         require(
             bytes(prefix_).length < maxSizePrefix,
@@ -199,12 +207,19 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         emit ChangePrice(id, price);
     }
 
-    function reRent(uint256 prefixNumber, uint256 duration) external payable override checkPause {
-        
-        require( duration >= MIN_DURATION, "Error: duration incorrect");
+    function reRent(uint256 prefixNumber, uint256 duration)
+        external
+        payable
+        override
+        checkPause
+    {
+        require(duration >= MIN_DURATION, "Error: duration incorrect");
         uint256 lenNumber = bytes(prefixNumber.toString()).length;
         uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
-        require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect value price");
+        require(
+            msg.value >= (prefixPrice[prefix_] * duration) / MIN_DURATION,
+            "Error: incorrect value price"
+        );
         endRent[prefixNumber] += duration;
 
         (bool success, ) = payable(prefixOwner[prefix_]).call{value: msg.value}(
@@ -216,25 +231,30 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         );
     }
 
-
     function registerNumber(uint256 prefixNumber, uint256 duration)
         external
         payable
         override
         checkPause
-    {   
-        require(block.timestamp > endRent[prefixNumber], "Error: Rent don`t end");
-        require( duration >= MIN_DURATION, "Error: duration incorrect");
+    {
+        require(
+            block.timestamp > endRent[prefixNumber],
+            "Error: Rent don`t end"
+        );
+        require(duration >= MIN_DURATION, "Error: duration incorrect");
 
         uint256 lenNumber = bytes(prefixNumber.toString()).length;
         uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
         require(prefixOwner[prefix_] != address(0), "Error: incorrect prefix");
         require(lenNumber - 8 < 11, "Error: incorrect length number");
-        require(msg.value >= prefixPrice[prefix_] * duration / MIN_DURATION , "Error: incorrect value price");
+        require(
+            msg.value >= (prefixPrice[prefix_] * duration) / MIN_DURATION,
+            "Error: incorrect value price"
+        );
 
         endRent[prefixNumber] = block.timestamp + duration;
 
-        if(_exists(prefixNumber)) {
+        if (_exists(prefixNumber)) {
             // Name was previously owned, and expired
             _burn(prefixNumber);
         }

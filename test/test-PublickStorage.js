@@ -20,7 +20,7 @@ describe("PublicStorage", function () {
       await publicStorage.connect(owner).addSocialOwner([1, 2, 3], ["Facebook", "Telegram", "Twiter"]);
       await dto.connect(bob).addPrefix("MTC", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")});
       var temp = BigNumber.from(await owner.getBalance());
-      await dto.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")});
+      await dto.connect(alice).registerNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")});
       expect((await dto.connect(alice).tokenOfOwnerByIndex(alice.address, 0)).toString()).to.equal("100000001234567890");
     });
 

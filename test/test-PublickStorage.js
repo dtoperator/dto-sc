@@ -3,25 +3,25 @@ const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 
 describe("PublicStorage", function () {
-    let decentralLink;
-    let DecentralLink;
+    let dto;
+    let DTO;
     before(async function () {
       [owner, alice, bob, eva] = await ethers.getSigners();
 
-      DecentralLink = await ethers.getContractFactory("DecentralLink");
+      DTO = await ethers.getContractFactory("DTO");
       PublicStorage = await ethers.getContractFactory("PublicStorage");
-      decentralLink = await DecentralLink.deploy("Test Phone Number", "TPN");
-      publicStorage = await PublicStorage.deploy(decentralLink.address);
+      dto = await DTO.deploy("Test Phone Number", "TPN", true, true);
+      publicStorage = await PublicStorage.deploy(dto.address);
 
-      await decentralLink.connect(owner).setBaseURI("test/");
-      await decentralLink.connect(owner).setPause(true);
-      await decentralLink.connect(owner).setPausePrefix(true);
+      await dto.connect(owner).setBaseURI("test/");
+      await dto.connect(owner).setPause(true);
+      await dto.connect(owner).setPausePrefix(true);
       await publicStorage.connect(owner).addBlockchainOwner([1, 2, 3], ["BSC", "ETH", "BTC"]);
       await publicStorage.connect(owner).addSocialOwner([1, 2, 3], ["Facebook", "Telegram", "Twiter"]);
-      await decentralLink.connect(bob).addPrefix("MTC", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")});
+      await dto.connect(bob).addPrefix("MTC", await ethers.utils.parseEther("0.1"), {value: await ethers.utils.parseEther("100")});
       var temp = BigNumber.from(await owner.getBalance());
-      await decentralLink.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")});
-      expect((await decentralLink.connect(alice).tokenOfOwnerByIndex(alice.address, 0)).toString()).to.equal("100000001234567890");
+      await dto.connect(alice).mintNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")});
+      expect((await dto.connect(alice).tokenOfOwnerByIndex(alice.address, 0)).toString()).to.equal("100000001234567890");
     });
 
 

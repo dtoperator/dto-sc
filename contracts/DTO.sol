@@ -1,13 +1,12 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./interface/IDecentralLink.sol";
+import "./interface/IDTO.sol";
 
-contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
+contract DTO is ERC721Enumerable, Ownable, IDTO {
     using Strings for uint256;
 
     uint256 constant public MIN_DURATION = 365 days; 
@@ -35,9 +34,12 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
     event ChangePrice(uint256 id, uint256 price_);
     event MintNumber(uint256 prefixNumber, uint256 duration);
 
-    constructor(string memory name_, string memory symbol_)
+    constructor(string memory name_, string memory symbol_, bool statusPause, bool statusPrefix_)
         ERC721(name_, symbol_)
-    {}
+    {
+        pause = statusPause;
+        statusPrefix = statusPrefix_;
+    }
 
     modifier checkPause() {
         require(pause, "Error: Contract paused");
@@ -90,7 +92,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
         return _baseURI();
     }
 
-    function setPause(bool status_) external override {
+    function setPause(bool status_) external override onlyOwner {
         pause = status_;
     }
 
@@ -215,7 +217,7 @@ contract DecentralLink is ERC721Enumerable, Ownable, IDecentralLink {
     }
 
 
-    function mintNumber(uint256 prefixNumber, uint256 duration)
+    function registerNumber(uint256 prefixNumber, uint256 duration)
         external
         payable
         override

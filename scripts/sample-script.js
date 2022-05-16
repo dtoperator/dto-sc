@@ -4,6 +4,8 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
+const { ethers, run } = require("hardhat");
+
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -14,12 +16,54 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Greeter = await hre.ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+  const DTO = await hre.ethers.getContractFactory("DTO");
+  const PublicStorage = await hre.ethers.getContractFactory("PublicStorage");
+  const dto = await DTO.deploy("Decentralized Telecommunication Operator", "DTO", true, true);
+  const publicStorage = await PublicStorage.deploy(dto.address);
 
-  await greeter.deployed();
+  // const decentralLink = await DecentralLink.attach("0x9A32a1f4411cDE0d2E1Dea0917CAe56c502b128f");
+  // // const publicStorage = await PublicStorage.attach("");
 
-  console.log("Greeter deployed to:", greeter.address);
+  await dto.deployed();
+  await publicStorage.deployed();
+
+  console.log("DecentralLink deployed to:", dto.address);
+  console.log("PublicStorage deployed to:", publicStorage.address);
+  var tx = await dto.setBaseURI("test/", {gasLimit: 1e5});
+  await tx.wait();
+  tx = await dto.addPrefixOwner("DTO", await ethers.utils.parseEther("0.1"), {gasPrice: 5000000000, gasLimit: 1e6});
+  await tx.wait();
+
+  try {
+    await run('verify:verify', {
+      address: dto.address,
+      constructorArguments: [
+        "Decentralized Telecommunication Operator",
+        "DTO",
+        "true",
+        "true"
+      ],
+    })
+  } catch {
+    console.log("Error: verify DTO")
+  }
+  try {
+    await hre.run('verify:verify', {
+      address: publicStorage.address,
+      constructorArguments: [
+        dto.address
+      ],
+    })
+  } catch {
+    console.log("Error: verify PublicStorage")
+  }
+
+
+
+  console.log("DecentralLink deployed to:", dto.address);
+  console.log("PublicStorage deployed to:", publicStorage.address);
+
+  
 }
 
 // We recommend this pattern to be able to use async/await everywhere

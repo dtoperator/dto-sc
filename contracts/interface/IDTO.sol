@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-interface IDecentralLink {
+interface IDTO {
     function setPause(bool status_) external;
 
     function setSalePrice(uint256 price) external;
@@ -23,5 +23,5 @@ interface IDecentralLink {
 
     function reRent(uint256 prefixNumber, uint256 duration) external payable;
 
-    function mintNumber(uint256 number, uint256 duration) external payable;
+    function registerNumber(uint256 number, uint256 duration) external payable;
 }

@@ -6,33 +6,52 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interface/IDTO.sol";
 
+/// @title Decentralized Telecommunication Operator
 contract DTO is ERC721Enumerable, Ownable, IDTO {
+    
+
     using Strings for uint256;
 
+    /// @notice The minimum duration rent
     uint256 public constant MIN_DURATION = 365 days;
 
-    // Base URI
+    /// @notice Base URI
     string private _uri;
 
-    uint256 public counter = 10000000;
+    /// @notice The counter id prefix
+    uint256 public counter = 10000000;\
+
+    /// @notice Max size prefix
     uint256 public maxSizePrefix = 10;
 
+    /// @notice Price prefix
     uint256 private _salePrice = 100 ether;
 
+    /// @notice The data prefix
     mapping(uint256 => uint256) public prefixPrice;
     mapping(uint256 => address) public prefixOwner;
     mapping(uint256 => string) public prefixName;
     mapping(string => uint256) public prefixId;
 
+    /// @notice The duration rent of number
     mapping(uint256 => uint256) public endRent;
 
+    /// @notice Status of contract
     bool public pause;
     bool public statusPrefix;
 
+    /// @notice Event contract
     event AddPrefix(string prefix_, uint256 counter_, uint256 price_);
     event ChangePrice(uint256 id, uint256 price_);
     event MintNumber(uint256 prefixNumber, uint256 duration);
 
+    /**
+     * @notice Construct a new contract
+     * @param name_ name of contract
+     * @param symbol_ abbreviation
+     * @param statusPause status (true/false) contract
+     * @param statusPrefix_ status sale prefix
+     */ 
     constructor(
         string memory name_,
         string memory symbol_,
@@ -52,15 +71,28 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         require(statusPrefix, "Error: Mint Prefix paused");
         _;
     }
-
-    function setBaseURI(string memory uri_) external onlyOwner {
+    
+    /**
+     * @notice set base URI
+     * @param uri_ The string with URI
+     */
+    function setBaseURI(string memory uri_) external override onlyOwner {
         _uri = uri_;
     }
 
-    function setPausePrefix(bool status) external onlyOwner {
+    /**
+     * @notice set start or end sale prefix
+     * @param status bool value
+     */
+    function setPausePrefix(bool status) external override onlyOwner {
         statusPrefix = status;
     }
 
+    /**
+     * @notice get token URI
+     * @param tokenId uint256 value with id number
+     * @return String value equals URI with metadata
+     */
     function tokenURI(uint256 tokenId)
         public
         view
@@ -86,26 +118,51 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
                 : "";
     }
 
+    /**
+     * @notice get base URI
+     * @return String value equals base URI with metadata
+     */
     function _baseURI() internal view override returns (string memory) {
         return _uri;
     }
 
+    /**
+     * @notice get base URI
+     * @return String value equals base URI with metadata
+     */
     function baseURI() public view returns (string memory) {
         return _baseURI();
     }
 
+    /**
+     * @notice set start or end contract
+     * @param status_ bool value
+     */
     function setPause(bool status_) external override onlyOwner {
         pause = status_;
     }
 
+    /**
+     * @notice set cost of prefix
+     * @param price uint256 price prefix
+     */
     function setSalePrice(uint256 price) external override onlyOwner {
         _salePrice = price;
     }
 
+    /**
+     * @notice set size prefix
+     * @param size number symbol in Prefix
+     */
     function setMaxSizePrefix(uint256 size) external override onlyOwner {
         maxSizePrefix = size;
     }
 
+    /**
+     * @notice change owner prefix
+     * @param prefix prefix name
+     * @param newAddress new address of owner
+     */
     function changeOwnerPrerix(string memory prefix, address newAddress)
         external
         override
@@ -117,6 +174,13 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         prefixOwner[prefixId[prefix]] = newAddress;
     }
 
+    /**
+     * @notice check prefix name for spaces
+     * @param _base prefix name
+     * @param _value checking value
+     * @param _offset start value check
+     * @return bool status checking
+     */
     function _indexOf(
         string memory _base,
         string memory _value,
@@ -136,6 +200,13 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         return true;
     }
 
+    /**
+     * @notice internal function add Prefix
+     * @param prefix_ prefix name
+     * @param price prefix price
+     * @param userAddress address prefix Owner
+     * @return return prefix Id
+     */
     function _addPrefix(
         string memory prefix_,
         uint256 price,
@@ -162,6 +233,12 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         return counter - 1;
     }
 
+    /**
+     * @notice add Prefix Owner contract
+     * @param prefix_ prefix name
+     * @param price prefix price
+     * @return prefix Id
+     */
     function addPrefixOwner(string memory prefix_, uint256 price)
         external
         override
@@ -173,6 +250,12 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         return _addPrefix(prefix_, price, msg.sender);
     }
 
+    /**
+     * @notice payable function add Prefix
+     * @param prefix_ prefix name
+     * @param price prefix price
+     * @return prefix Id
+     */
     function addPrefix(string memory prefix_, uint256 price)
         external
         payable
@@ -193,7 +276,12 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
 
         return id;
     }
-
+    
+    /**
+     * @notice set Price Number in Prefix
+     * @param id prefix Id
+     * @param price number price
+     */
     function changePrice(uint256 id, uint256 price)
         external
         override
@@ -207,6 +295,11 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         emit ChangePrice(id, price);
     }
 
+    /**
+     * @notice set new rent duration
+     * @param prefixNumber token ID
+     * @param duration new rent
+     */
     function reRent(uint256 prefixNumber, uint256 duration)
         external
         payable
@@ -231,6 +324,11 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         );
     }
 
+    /**
+     * @notice register new Number
+     * @param prefixNumber token ID
+     * @param duration new rent
+     */
     function registerNumber(uint256 prefixNumber, uint256 duration)
         external
         payable

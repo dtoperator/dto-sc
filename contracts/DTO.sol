@@ -19,7 +19,7 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
     string private _uri;
 
     /// @notice The counter id prefix
-    uint256 public counter = 10000000;\
+    uint256 public counter = 10000000;
 
     /// @notice Max size prefix
     uint256 public maxSizePrefix = 10;
@@ -130,7 +130,7 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
      * @notice get base URI
      * @return String value equals base URI with metadata
      */
-    function baseURI() public view returns (string memory) {
+    function baseURI() public view override returns (string memory) {
         return _baseURI();
     }
 

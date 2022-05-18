@@ -42,7 +42,7 @@ interface IDTO {
 
     /**
      * @notice change owner prefix
-     * @param prefix prefix name
+     * @param prefix_ prefix name
      * @param newAddress new address of owner
      */
     function changeOwnerPrerix(string memory prefix_, address newAddress)

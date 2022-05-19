@@ -89,36 +89,6 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
     }
 
     /**
-     * @notice get token URI
-     * @param tokenId uint256 value with id number
-     * @return String value equals URI with metadata
-     */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
-        );
-
-        uint256 lenNumber = bytes(tokenId.toString()).length;
-        uint256 prefix_ = uint256(tokenId / 10**(lenNumber - 8));
-        uint256 number_ = tokenId % 10**(lenNumber - 8);
-        string memory baseURI_ = string(
-            abi.encodePacked(_baseURI(), prefixName[prefix_])
-        );
-
-        return
-            bytes(_baseURI()).length > 0
-                ? string(abi.encodePacked(baseURI_, number_.toString()))
-                : "";
-    }
-
-    /**
      * @notice get base URI
      * @return String value equals base URI with metadata
      */

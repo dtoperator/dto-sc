@@ -26,7 +26,7 @@ describe("DTO", function () {
       await dto.connect(alice).registerNumber(BigNumber.from("100000001234567890"), 31536000, {value: await ethers.utils.parseEther("0.1")});
       expect((await dto.connect(alice).tokenOfOwnerByIndex(alice.address, 0)).toString()).to.equal("100000001234567890");
       expect(temp.add(await ethers.utils.parseEther("0.1")).eq(await owner.getBalance())).is.true;
-      expect(await dto.tokenURI(BigNumber.from("100000001234567890"))).to.equal("test/MTC1234567890");
+      expect(await dto.tokenURI(BigNumber.from("100000001234567890"))).to.equal("test/100000001234567890");
       expect(await dto.baseURI()).to.equal("test/");
       await dto.connect(owner).setMaxSizePrefix(await ethers.utils.parseEther("200"));
       expect(BigNumber.from(await dto.maxSizePrefix()).eq(await ethers.utils.parseEther("200"))).is.true;

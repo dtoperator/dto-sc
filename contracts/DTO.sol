@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -8,8 +8,6 @@ import "./interface/IDTO.sol";
 
 /// @title Decentralized Telecommunication Operator
 contract DTO is ERC721Enumerable, Ownable, IDTO {
-    
-
     using Strings for uint256;
 
     /// @notice The minimum duration rent
@@ -48,7 +46,7 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
     /**
      * @notice Construct a new contract
      * @param name_ name of contract
-     * @param symbol_ abbreviation
+     * @param symbol_ symbol
      * @param statusPause status (true/false) contract
      * @param statusPrefix_ status sale prefix
      */ 
@@ -71,7 +69,7 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
         require(statusPrefix, "Error: Mint Prefix paused");
         _;
     }
-    
+
     /**
      * @notice set base URI
      * @param uri_ The string with URI
@@ -81,35 +79,19 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
     }
 
     /**
-     * @notice set start or end sale prefix
-     * @param status bool value
-     */
-    function setPausePrefix(bool status) external override onlyOwner {
-        statusPrefix = status;
-    }
-
-    /**
-     * @notice get base URI
-     * @return String value equals base URI with metadata
-     */
-    function _baseURI() internal view override returns (string memory) {
-        return _uri;
-    }
-
-    /**
-     * @notice get base URI
-     * @return String value equals base URI with metadata
-     */
-    function baseURI() public view override returns (string memory) {
-        return _baseURI();
-    }
-
-    /**
      * @notice set start or end contract
      * @param status_ bool value
      */
     function setPause(bool status_) external override onlyOwner {
         pause = status_;
+    }
+
+    /**
+     * @notice set start or end sale prefix
+     * @param status bool value
+     */
+    function setPausePrefix(bool status) external override onlyOwner {
+        statusPrefix = status;
     }
 
     /**
@@ -126,81 +108,6 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
      */
     function setMaxSizePrefix(uint256 size) external override onlyOwner {
         maxSizePrefix = size;
-    }
-
-    /**
-     * @notice change owner prefix
-     * @param prefix prefix name
-     * @param newAddress new address of owner
-     */
-    function changeOwnerPrerix(string memory prefix, address newAddress)
-        external
-        override
-    {
-        require(
-            prefixOwner[prefixId[prefix]] == msg.sender,
-            "Error: You don`t owner this prefix"
-        );
-        prefixOwner[prefixId[prefix]] = newAddress;
-    }
-
-    /**
-     * @notice check prefix name for spaces
-     * @param _base prefix name
-     * @param _value checking value
-     * @param _offset start value check
-     * @return bool status checking
-     */
-    function _indexOf(
-        string memory _base,
-        string memory _value,
-        uint256 _offset
-    ) internal pure returns (bool) {
-        bytes memory _baseBytes = bytes(_base);
-        bytes memory _valueBytes = bytes(_value);
-
-        require(_valueBytes.length == 1, "Error in indexOf");
-
-        for (uint256 i = _offset; i < _baseBytes.length; i++) {
-            if (_baseBytes[i] == _valueBytes[0]) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @notice internal function add Prefix
-     * @param prefix_ prefix name
-     * @param price prefix price
-     * @param userAddress address prefix Owner
-     * @return return prefix Id
-     */
-    function _addPrefix(
-        string memory prefix_,
-        uint256 price,
-        address userAddress
-    ) internal returns (uint256) {
-        require(bytes(prefix_).length > 0, "Error: Empty string");
-        require(
-            bytes(prefix_).length < maxSizePrefix,
-            "Error: This prefix bigest"
-        );
-        require(_indexOf(prefix_, " ", 0), "Error: Prefix contains a space");
-        require(prefixId[prefix_] < 100000000, "This prefix busy");
-        require(counter < 100000000, "Error: end prefix counter");
-
-        prefixPrice[counter] = price;
-        prefixOwner[counter] = userAddress;
-        prefixName[counter] = prefix_;
-        prefixId[prefix_] = counter;
-
-        counter++;
-
-        emit AddPrefix(prefix_, counter - 1, price);
-
-        return counter - 1;
     }
 
     /**
@@ -246,7 +153,23 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
 
         return id;
     }
-    
+
+    /**
+     * @notice change owner prefix
+     * @param prefix prefix name
+     * @param newAddress new address of owner
+     */
+    function changeOwnerPrerix(string memory prefix, address newAddress)
+        external
+        override
+    {
+        require(
+            prefixOwner[prefixId[prefix]] == msg.sender,
+            "Error: You don`t owner this prefix"
+        );
+        prefixOwner[prefixId[prefix]] = newAddress;
+    }
+
     /**
      * @notice set Price Number in Prefix
      * @param id prefix Id
@@ -338,5 +261,80 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
             success,
             "Address: unable to send value, recipient may have reverted"
         );
+    }
+
+    /**
+     * @notice get base URI
+     * @return String value equals base URI with metadata
+     */
+    function baseURI() public view override returns (string memory) {
+        return _baseURI();
+    }
+
+    /**
+     * @notice get base URI
+     * @return String value equals base URI with metadata
+     */
+    function _baseURI() internal view override returns (string memory) {
+        return _uri;
+    }
+
+    /**
+     * @notice check prefix name for spaces
+     * @param _base prefix name
+     * @param _value checking value
+     * @param _offset start value check
+     * @return bool status checking
+     */
+    function _indexOf(
+        string memory _base,
+        string memory _value,
+        uint256 _offset
+    ) internal pure returns (bool) {
+        bytes memory _baseBytes = bytes(_base);
+        bytes memory _valueBytes = bytes(_value);
+
+        require(_valueBytes.length == 1, "Error in indexOf");
+
+        for (uint256 i = _offset; i < _baseBytes.length; i++) {
+            if (_baseBytes[i] == _valueBytes[0]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @notice internal function add Prefix
+     * @param prefix_ prefix name
+     * @param price prefix price
+     * @param userAddress address prefix Owner
+     * @return return prefix Id
+     */
+    function _addPrefix(
+        string memory prefix_,
+        uint256 price,
+        address userAddress
+    ) internal returns (uint256) {
+        require(bytes(prefix_).length > 0, "Error: Empty string");
+        require(
+            bytes(prefix_).length < maxSizePrefix,
+            "Error: This prefix bigest"
+        );
+        require(_indexOf(prefix_, " ", 0), "Error: Prefix contains a space");
+        require(prefixId[prefix_] < 100000000, "This prefix busy");
+        require(counter < 100000000, "Error: end prefix counter");
+
+        prefixPrice[counter] = price;
+        prefixOwner[counter] = userAddress;
+        prefixName[counter] = prefix_;
+        prefixId[prefix_] = counter;
+
+        counter++;
+
+        emit AddPrefix(prefix_, counter - 1, price);
+
+        return counter - 1;
     }
 }

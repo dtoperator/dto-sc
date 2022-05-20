@@ -1,16 +1,17 @@
-# Basic Sample Hardhat Project
+# DTO smart contracts
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+# Local Development
 
-Try running some of the following tasks:
+The following assumes the use of `node@>=14`.
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-npx hardhat coverage
-```
+## Install Dependencies
+
+`yarn`
+
+## Compile Contracts
+
+`yarn compile`
+
+## Run Tests
+
+`yarn test`

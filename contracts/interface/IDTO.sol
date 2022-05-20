@@ -1,9 +1,8 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 /// @title interface Decentralized Telecommunication Operator (DTO)
 interface IDTO {
-
     /**
      * @notice set base URI
      * @param uri_ The string with URI
@@ -11,22 +10,16 @@ interface IDTO {
     function setBaseURI(string memory uri_) external;
 
     /**
-     * @notice get base URI
-     * @return String value equals base URI with metadata
+     * @notice set start or end contract
+     * @param status_ bool value
      */
-    function baseURI() external view returns (string memory);
+    function setPause(bool status_) external;
 
     /**
      * @notice set start or end sale prefix
      * @param status bool value
      */
     function setPausePrefix(bool status) external;
-
-    /**
-     * @notice set start or end contract
-     * @param status_ bool value
-     */    
-    function setPause(bool status_) external;
 
     /**
      * @notice set cost of prefix
@@ -39,14 +32,6 @@ interface IDTO {
      * @param size number symbol in Prefix
      */
     function setMaxSizePrefix(uint256 size) external;
-
-    /**
-     * @notice change owner prefix
-     * @param prefix_ prefix name
-     * @param newAddress new address of owner
-     */
-    function changeOwnerPrerix(string memory prefix_, address newAddress)
-        external;
 
     /**
      * @notice add Prefix Owner contract
@@ -70,6 +55,14 @@ interface IDTO {
         returns (uint256);
 
     /**
+     * @notice change owner prefix
+     * @param prefix_ prefix name
+     * @param newAddress new address of owner
+     */
+    function changeOwnerPrerix(string memory prefix_, address newAddress)
+        external;
+
+    /**
      * @notice set Price Number in Prefix
      * @param id prefix Id
      * @param price number price
@@ -88,5 +81,13 @@ interface IDTO {
      * @param prefixNumber token ID
      * @param duration new rent
      */
-    function registerNumber(uint256 prefixNumber, uint256 duration) external payable;
+    function registerNumber(uint256 prefixNumber, uint256 duration)
+        external
+        payable;
+
+    /**
+     * @notice get base URI
+     * @return String value equals base URI with metadata
+     */
+    function baseURI() external view returns (string memory);
 }

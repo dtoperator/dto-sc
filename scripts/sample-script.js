@@ -21,13 +21,13 @@ async function main() {
   const dto = await DTO.deploy("Decentralized Telecommunication Operator", "DTO", true, true);
   const publicStorage = await PublicStorage.deploy(dto.address);
 
-  // const decentralLink = await DecentralLink.attach("0x9A32a1f4411cDE0d2E1Dea0917CAe56c502b128f");
-  // // const publicStorage = await PublicStorage.attach("");
+  // const dto = await DTO.attach("");
+  // const publicStorage = await PublicStorage.attach("");
 
   await dto.deployed();
   await publicStorage.deployed();
 
-  console.log("DecentralLink deployed to:", dto.address);
+  console.log("DTO deployed to:", dto.address);
   console.log("PublicStorage deployed to:", publicStorage.address);
   // var tx = await dto.setBaseURI("test/", {gasLimit: 1e5});
   // await tx.wait();
@@ -47,6 +47,7 @@ async function main() {
   } catch {
     console.log("Error: verify DTO")
   }
+
   try {
     await hre.run('verify:verify', {
       address: publicStorage.address,
@@ -58,12 +59,8 @@ async function main() {
     console.log("Error: verify PublicStorage")
   }
 
-
-
-  console.log("DecentralLink deployed to:", dto.address);
+  console.log("DTO deployed to:", dto.address);
   console.log("PublicStorage deployed to:", publicStorage.address);
-
-  
 }
 
 // We recommend this pattern to be able to use async/await everywhere

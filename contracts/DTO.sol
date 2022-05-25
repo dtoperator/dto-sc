@@ -39,7 +39,7 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
     bool public statusPrefix;
 
     /// @notice Event contract
-    event AddPrefix(string prefix_, uint256 counter_, uint256 price_);
+    event AddPrefix(string prefix_, uint256 prefixId_, uint256 price_);
     event ChangePrice(uint256 id, uint256 price_);
     event MintNumber(uint256 prefixNumber, uint256 duration);
 

@@ -275,6 +275,7 @@ module.exports = {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
     apiKey: {
+      mainnet: API_ETHERSCAN,
       rinkeby: API_ETHERSCAN
     }
   }

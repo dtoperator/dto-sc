@@ -5,7 +5,7 @@ require("solidity-coverage");
 require("@nomiclabs/hardhat-web3");
 require("@nomiclabs/hardhat-etherscan");
 
-const { API_COINMARKET, PRIV_KEY , API_ETHERSCAN} = process.env;
+const { API_COINMARKET, PRIV_KEY, API_ETHERSCAN } = process.env;
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {

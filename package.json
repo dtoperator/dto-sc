@@ -22,7 +22,7 @@
     "ropsten:deploy": "hardhat --network ropsten deploy",
     "ropsten:verify": "hardhat --network ropsten etherscan-verify --solc-input",
     "ropsten:export": "hardhat --network ropsten export --export exports/ropsten.json",
-    "rinkeby:deploy": "hardhat --network rinkeby deploy",
+    "rinkeby:deploy": "hardhat run --network rinkeby scripts/deploy.js",
     "rinkeby:verify": "hardhat --network rinkeby etherscan-verify --solc-input",
     "rinkeby:export": "hardhat --network rinkeby export --export exports/rinkeby.json",
     "goerli:deploy": "hardhat --network goerli deploy",

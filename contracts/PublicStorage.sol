@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "./interface/IPublicStorage.sol";
@@ -7,14 +7,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 /// @title Contract PublicStorage for storage info number
 contract PublicStorage is IPublicStorage, Ownable {
-
     /// @notice interface DTO (IERC721)
     IERC721 public dto;
     
     /// @notice by token consist of address in different chains
     mapping(uint256 => mapping(uint256 => string)) private addressChain;
     
-    /// @notice by token consist of address in different sosial networks
+    /// @notice by token consist of address in different social networks
     mapping(uint256 => mapping(uint256 => string)) private userNameSocial;
 
     /// @notice User Information by token ID 

@@ -41,7 +41,7 @@ module.exports = {
       gasMultiplier: 2,
     },
     rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALC_API_KEY}`,
+      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
       accounts: [PRIV_KEY],
       chainId: 4,
       gasPrice: 50000000000,
@@ -276,7 +276,9 @@ module.exports = {
     // Obtain one at https://etherscan.io/
     apiKey: {
       mainnet: API_ETHERSCAN,
-      rinkeby: API_ETHERSCAN
+      ropsten: API_ETHERSCAN,
+      rinkeby: API_ETHERSCAN,
+      goerli: API_ETHERSCAN
     }
   }
 };

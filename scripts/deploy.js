@@ -44,8 +44,9 @@ async function main() {
         "true"
       ],
     })
-  } catch {
+  } catch (err) {
     console.log("Error: verify DTO")
+    console.log(err)
   }
 
   try {
@@ -55,8 +56,9 @@ async function main() {
         dto.address
       ],
     })
-  } catch {
+  } catch (err) {
     console.log("Error: verify PublicStorage")
+    console.log(err)
   }
 
   console.log("DTO deployed to:", dto.address);

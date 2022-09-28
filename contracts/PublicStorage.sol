@@ -41,7 +41,6 @@ contract PublicStorage is IPublicStorage, Ownable {
 
     modifier lengthArray(uint256[] memory idArray) {
         require(idArray.length < 5, "Error: big counter idBLockchain");
-
         _;
     }
 

@@ -70,18 +70,10 @@ interface IDTO {
     function changePrice(uint256 id, uint256 price) external;
 
     /**
-     * @notice set new rent duration
-     * @param prefixNumber token ID
-     * @param duration new rent
-     */
-    function reRent(uint256 prefixNumber, uint256 duration) external payable;
-
-    /**
      * @notice register new Number
      * @param prefixNumber token ID
-     * @param duration new rent
      */
-    function registerNumber(uint256 prefixNumber, uint256 duration)
+    function registerNumber(uint256 prefixNumber)
         external
         payable;
 

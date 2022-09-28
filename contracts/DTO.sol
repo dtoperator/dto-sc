@@ -10,9 +10,6 @@ import "./interface/IDTO.sol";
 contract DTO is ERC721Enumerable, Ownable, IDTO {
     using Strings for uint256;
 
-    /// @notice The minimum duration rent
-    uint256 public constant MIN_DURATION = 365 days;
-
     /// @notice Base URI
     string private _uri;
 
@@ -31,9 +28,6 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
     mapping(uint256 => string) public prefixName;
     mapping(string => uint256) public prefixId;
 
-    /// @notice The duration rent of number
-    mapping(uint256 => uint256) public endRent;
-
     /// @notice Status of contract
     bool public pause;
     bool public statusPrefix;
@@ -41,7 +35,7 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
     /// @notice Event contract
     event AddPrefix(string prefix_, uint256 prefixId_, uint256 price_);
     event ChangePrice(uint256 id, uint256 price_);
-    event MintNumber(uint256 prefixNumber, uint256 duration);
+    event MintNumber(uint256 prefixNumber);
 
     /**
      * @notice Construct a new contract
@@ -189,70 +183,27 @@ contract DTO is ERC721Enumerable, Ownable, IDTO {
     }
 
     /**
-     * @notice set new rent duration
-     * @param prefixNumber token ID
-     * @param duration new rent
-     */
-    function reRent(uint256 prefixNumber, uint256 duration)
-        external
-        payable
-        override
-        checkPause
-    {
-        require(duration >= MIN_DURATION, "Error: duration incorrect");
-        uint256 lenNumber = bytes(prefixNumber.toString()).length;
-        uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
-        require(
-            msg.value >= (prefixPrice[prefix_] * duration) / MIN_DURATION,
-            "Error: incorrect value price"
-        );
-        endRent[prefixNumber] += duration;
-
-        (bool success, ) = payable(prefixOwner[prefix_]).call{value: msg.value}(
-            ""
-        );
-        require(
-            success,
-            "Address: unable to send value, recipient may have reverted"
-        );
-    }
-
-    /**
      * @notice register new Number
      * @param prefixNumber token ID
-     * @param duration new rent
      */
-    function registerNumber(uint256 prefixNumber, uint256 duration)
+    function registerNumber(uint256 prefixNumber)
         external
         payable
         override
         checkPause
     {
-        require(
-            block.timestamp > endRent[prefixNumber],
-            "Error: Rent don`t end"
-        );
-        require(duration >= MIN_DURATION, "Error: duration incorrect");
-
         uint256 lenNumber = bytes(prefixNumber.toString()).length;
         uint256 prefix_ = prefixNumber / 10**(lenNumber - 8);
         require(prefixOwner[prefix_] != address(0), "Error: incorrect prefix");
         require(lenNumber - 8 < 11, "Error: incorrect length number");
         require(
-            msg.value >= (prefixPrice[prefix_] * duration) / MIN_DURATION,
+            msg.value >= prefixPrice[prefix_],
             "Error: incorrect value price"
         );
 
-        endRent[prefixNumber] = block.timestamp + duration;
-
-        if (_exists(prefixNumber)) {
-            // Name was previously owned, and expired
-            _burn(prefixNumber);
-        }
-
         _safeMint(msg.sender, prefixNumber);
 
-        emit MintNumber(prefixNumber, duration);
+        emit MintNumber(prefixNumber);
 
         (bool success, ) = payable(prefixOwner[prefix_]).call{value: msg.value}(
             ""

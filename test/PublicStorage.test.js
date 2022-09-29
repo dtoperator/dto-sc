@@ -30,7 +30,7 @@ describe("PublicStorage", function () {
     var temp = BigNumber.from(await owner.getBalance());
     await dto
       .connect(alice)
-      .registerNumber(BigNumber.from("100000001234567890"), 31536000, {
+      .registerNumber(BigNumber.from("100000001234567890"), {
         value: await ethers.utils.parseEther("0.1"),
       });
     expect(

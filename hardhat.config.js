@@ -269,8 +269,8 @@ module.exports = {
   // },
   gasReporter: {
     coinmarketcap: API_COINMARKET,
-    currency: 'USD',
-    enabled: false
+    currency: 'ETH',
+    enabled: true
   },
   etherscan: {
     // Your API key for Etherscan

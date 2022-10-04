@@ -5,7 +5,7 @@ require("solidity-coverage");
 require("@nomiclabs/hardhat-web3");
 require("@nomiclabs/hardhat-etherscan");
 
-const { API_COINMARKET, PRIV_KEY , API_ETHERSCAN} = process.env;
+const { API_COINMARKET, PRIVAT_KEY , API_ETHERSCAN} = process.env;
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -30,7 +30,15 @@ module.exports = {
         accountsBalance: "1000000000000000000000000"
       }
     },
-  },  
+
+    rinkeby: {
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALC_API_KEY}`,
+      accounts: [PRIVAT_KEY],
+      chainId: 4,
+      gasPrice: 50000000000,
+      gasLimit: 100000,
+    },
+  },
   //   ropsten: {
   //     url: `https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}`,
   //     accounts: [PRIV_KEY],
@@ -41,13 +49,9 @@ module.exports = {
   //     gasPrice: 5000000000,
   //     gasMultiplier: 2,
   //   },
-  //   rinkeby: {
-  //     url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALC_API_KEY}`,
-  //     accounts: [PRIV_KEY],
-  //     chainId: 4,
-  //     gasPrice: 50000000000,
-  //     gasLimit: 100000,
-  //   },
+
+    
+  
   //   mainnet: {
   //     url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
   //     accounts: [PRIV_KEY],

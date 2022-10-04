@@ -4,7 +4,6 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
-const { ethers, run } = require("hardhat");
 
 
 async function main() {
@@ -44,7 +43,7 @@ async function main() {
         "true"
       ],
     })
-  } catch {
+  } catch (err){
     console.log("Error: verify DTO")
   }
 
@@ -55,7 +54,7 @@ async function main() {
         dto.address
       ],
     })
-  } catch {
+  } catch (err) {
     console.log("Error: verify PublicStorage")
   }
 
